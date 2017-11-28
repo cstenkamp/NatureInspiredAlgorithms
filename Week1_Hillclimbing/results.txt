@@ -1,0 +1,24 @@
+Results with every combination of Neighbourhood x best/first averaged over 1000 trials:
+
+Max size 20466.0
+Best Choice, Small neighborhood
+  Mean Iterations: 4.588
+  Mean max-val: 115907.054
+  Mean Overall Time: 28.8706080914
+  Mean Time per Iter: 6.25163521313
+Best Choice, Big neighborhood
+  Mean Iterations: 4.831
+  Mean max-val: 118505.845
+  Mean Overall Time: 170.300821066
+  Mean Time per Iter: 34.1332574681
+First Choice, Small neighborhood
+  Mean Iterations: 4.637
+  Mean max-val: 117558.886
+  Mean Overall Time: 8.01498103142
+  Mean Time per Iter: 1.87265369769
+First Choice, Big neighborhood
+  Mean Iterations: 5.034
+  Mean max-val: 119149.181
+  Mean Overall Time: 176.527447224
+  Mean Time per Iter: 33.7718917023
+Best of all: 128713
