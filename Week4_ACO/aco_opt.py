@@ -2,6 +2,7 @@ import numpy as np
 from multiprocessing import Process
 from time import time
 import csv
+import matplotlib.pyplot as plt
 
 NUM_NOCHANGEITERS_FOR_CONVERGENCE = 20
 
@@ -47,7 +48,7 @@ def softmax(X):
     return np.exp(X)/np.sum(np.exp(X))
 
 
-def ACO(costMat, trials=1, iterations=100, alpha=1, beta=1, num_ants=10, p_ants=1, tau=10, evap_rate=0.1, intensification=1, q=0.2, verbose=0, apply_softmax=False):
+def ACO(costMat, trials=1, iterations=100, alpha=1, beta=1, num_ants=10, p_ants=1, tau=10, evap_rate=0.1, intensification=1, q=0.2, verbose=0, apply_softmax=False, use_gaussian_heat=False):
     '''
     costMat:  TSP cost matrix
     num_ants: number of ants per iteration
@@ -72,7 +73,12 @@ def ACO(costMat, trials=1, iterations=100, alpha=1, beta=1, num_ants=10, p_ants=
         s_time = time()
         #### INITIALISATION ####
         pheroMat = np.full_like(costMat, tau) # pheromone matrix all equal, with pheroMat[i,j] > 0
-        heuriMat = 1/costMat # heuristic as the inverse of each cost value (high=good)
+        if use_gaussian_heat:
+            heuriMat = (np.exp(- costMat ** 2 / (2. * 10 ** 2))) # heuristics matrix created by transforming distance matrix with gaussian heat kernel
+        else:
+            heuriMat = 1/costMat # heuristic as the inverse of each cost value (high=good)
+
+        
         np.fill_diagonal(heuriMat,0) # diaogonal not needed
         probMat = probability_matrix(pheroMat, heuriMat, alpha, beta) # probability matrix
         soluMat = np.empty((num_ants,len(costMat),len(costMat)), dtype=np.float64) # solution matrix for every ant
@@ -80,6 +86,7 @@ def ACO(costMat, trials=1, iterations=100, alpha=1, beta=1, num_ants=10, p_ants=
         #### ITERATION ####
         no_change = 0
         l_pi = 0
+        alle = []
         for j in range(iterations):
             pi_trial = np.inf
             soluMat.fill(0) # ants start anew
@@ -116,6 +123,14 @@ def ACO(costMat, trials=1, iterations=100, alpha=1, beta=1, num_ants=10, p_ants=
                 break
             l_pi = pi_c
 
+            if verbose >= 3:
+                print(np.min(pheroMat), np.max(pheroMat))
+                plt.figure()
+                toshow = (np.log(pheroMat)/2.30258509); toshow[0,0] = 0
+                plt.imshow(toshow, cmap=plt.get_cmap("hot"))
+                plt.savefig("./phero_"+str(j)+".png")
+                plt.show()
+
             #### EVAPORATION ####
             pheroMat *= (1-evap_rate)
 
@@ -140,6 +155,8 @@ def ACO(costMat, trials=1, iterations=100, alpha=1, beta=1, num_ants=10, p_ants=
 
             if(verbose>=2): #log iteration info
                 print("T{trial}; Iteration {iter}: {best}".format(trial=i, iter=j, best=pi_c))
+            alle.append(pi_c)
+        print(alle)
         trial_bests.append(pi_trial) # save best trail result
         trial_times.append(time()-s_time) # save time
         if(verbose>=1): #log trial info
@@ -232,6 +249,10 @@ def main():
                 np.genfromtxt("3.tsp")]
     
     for i in range(len(problems)):
+        
+#        ACO(costMat=problems[i], trials=1, iterations=100, alpha=1, beta=4, num_ants=10, p_ants=1, tau=10, evap_rate=0.20, intensification=2, q=0.1, verbose=2)
+#        ACO(costMat=problems[i], trials=1, iterations=400, alpha=1, beta=0, num_ants=10, p_ants=1, tau=2, evap_rate=0.177, intensification=1.5, q=0.25, verbose=2)
+        
         #best overall
         ACO(costMat=problems[i], trials=1, iterations=400, alpha=1, beta=4, num_ants=100, p_ants=10, tau=10, evap_rate=0.20, intensification=2, q=0.1, verbose=2)
     

@@ -1,0 +1,5 @@
+Tim:  		Main Code
+Constantin:	Alternative methods
+Hendrik: 	Alternative methods
+Kai: 		Hyperparameter Search
+Christoph: 	Presentation
