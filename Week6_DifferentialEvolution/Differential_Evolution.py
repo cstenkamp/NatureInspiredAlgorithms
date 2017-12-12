@@ -1,5 +1,5 @@
-import numpy as np 
-import matplotlib.pyplot as plt 
+import numpy as np
+import matplotlib.pyplot as plt
 import csv
 
 class DifferentialEvolution():
@@ -15,7 +15,7 @@ class DifferentialEvolution():
 				scaling_factor = 1,
 				crossover_rate = .25,
 				max_iter=10000,
-				doPrint = True,				                
+				doPrint = True,
 				):
 
 		self.maxPrices = np.array(maxPrices)
@@ -24,8 +24,8 @@ class DifferentialEvolution():
 		self.kWhPerPlant = np.array(kWhPerPlant)
 		self.costPerPlant = np.array(costPerPlant)
 		self.maxPlants = np.array(maxPlants)
-		self.doPrint = doPrint        	
-		self.max_iter = max_iter        	
+		self.doPrint = doPrint
+		self.max_iter = max_iter
 		self.initPopulation(n_agents)
 		self.hist = self.optimize(scaling_factor=scaling_factor, crossover_rate=crossover_rate) #scaling_factor and crossover_rate can be passed, population_size is already in self.population
 		profit = []
@@ -52,7 +52,7 @@ class DifferentialEvolution():
 		if x == 0:
 			return 0
 		if x < 0:
-			return np.inf 
+			return np.inf
 		if x >= (kwhPerPlant * maxPlants):
 			return np.inf
 		plantsNeeded = np.ceil(x/kwhPerPlant)
@@ -91,30 +91,31 @@ class DifferentialEvolution():
 
 	def optimize(self, scaling_factor = 1, crossover_rate = .25, random_scaling = False):
 		n_agents = self.population.shape[0]
-		profit_hist = []
+		profit_hist = [0]
+		stop_crit = 0
 		for iter in range(self.max_iter):
 			profits = []
 			# for each agent
 			for ax in range(n_agents):
 				# agent to be optimized/mutated (->target vector)
-				x = self.population[ax,:] 
+				x = self.population[ax,:]
 				# four other agents
 				tmp = np.random.permutation(n_agents)[:4]
 				# take three that are not x (to ultimately generate the donor vector)
-				a,b,c = tmp[tmp!=ax][:3]   
+				a,b,c = tmp[tmp!=ax][:3]
 				# a will be the base vector, and the difference will be generated from b and c
 				donor_direction = self.population[b,:]-self.population[c,:]
-				## potential new agent 
-				Y = x.copy() 
+				## potential new agent
+				Y = x.copy()
 				# take random indice
 				R = np.random.randint(self.population.shape[1])
-				# take other random indices 
+				# take other random indices
 				i = np.random.rand(self.population.shape[1])<=crossover_rate #yields array of bools
-				# trial generation        
-				if random_scaling:            
-					y = self.population[a,:] + np.random.uniform(scaling_factor) * donor_direction 
+				# trial generation
+				if random_scaling:
+					y = self.population[a,:] + np.random.uniform(scaling_factor) * donor_direction
 				else:
-					y = self.population[a,:] + scaling_factor * donor_direction 
+					y = self.population[a,:] + scaling_factor * donor_direction
 				Y[R] = y[R]
 				Y[i] = y[i]
 				# reset below zero values
@@ -129,9 +130,18 @@ class DifferentialEvolution():
 				else:
 					profits.append(p0)
 			m = np.max(profits)
+			if(m==profit_hist[-1]):
+				stop_crit += 1
+			else:
+				stop_crit = 0
 			profit_hist.append(m)
+			if(stop_crit==2000):
+				self.iters = iter
+				print('Converged after iteration: {0:7d} | profit: {1:12.2f}'.format(iter,m))
+				return profit_hist
 			if iter % 100 == 0 and self.doPrint:
 				print('iteration: {0:7d} | profit: {1:12.2f}'.format(iter,m))
+		self.iters = self.max_iter
 		return profit_hist
 
 
@@ -149,22 +159,22 @@ def print_solutions(DiffEvProb, title):
     																np.sum(DiffEvProb.best[:3]),
     																np.sum(DiffEvProb.best[3:6])))
     print('')
-    print('')    
+    print('')
 
 
 def main():
     D1 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.6,n_agents=50)
     D2 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.1,n_agents=50)
     D3 = DifferentialEvolution(maxPrices=[.5,.3,.1], maxDemands=[1e6,5e6,5e6],costPrice=.6,n_agents=50)
-    
+
     print_solutions(D1, "Problem 1")
     print_solutions(D2, "Problem 2")
     print_solutions(D3, "Problem 3")
-    
+
     plt.plot(D1.hist)
     plt.plot(D2.hist)
     plt.plot(D3.hist)
-    
+
     plt.legend(['D1','D2','D3'])
     plt.title('Profits Per Problem')
     plt.xlabel('iteration')
@@ -174,42 +184,48 @@ def main():
 
 def parameterSearch(trials_each=5, problemnum = 1, filename=False):
     if(filename):
-        header = ["scaling_factor", "crossover_rate", "best", "mean"]
+        header = ["scaling_factor", "crossover_rate", "best", "mean", "md_iter", "best_iter"]
         data = [header]
-        
+
     for scalFact in [0.1, 0.3, 0.5, 0.7, 0.9, 1.0, 1.1, 1.5, 2]:
         for crossRate in [0, 0.1, 0.25, 0.5, 0.75, 0.9, 1]:
-        
+
             print("#######################################################")
             print("Scaling Factor: ", scalFact);
             print("Crossover Rate: ", crossRate);
-                 
+
             if problemnum == 1:
-                sols = [0]*trials_each               
+                sols = [0]*trials_each
+                iters = [0]*trials_each
                 for i in range(trials_each):
-                    D1 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.6, n_agents=50, scaling_factor = scalFact, crossover_rate = crossRate, doPrint=False, max_iter=10000)
+                    D1 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.6, n_agents=50, scaling_factor = scalFact, crossover_rate = crossRate, doPrint=False, max_iter=20000)
                     sols[i] = D1.calcProfit(D1.best)
-                print("Problem 1 | mean:",np.mean(sols), "| best:",np.max(sols))
+                    iters[i] = D1.iters
+                print("Problem 1 | mean:",np.mean(sols), "| best:",np.max(sols), "| iters:",np.median(iters))
                 if(filename):
-                    data.append([scalFact, crossRate, np.max(sols), np.mean(sols)])
-                
+                    data.append([scalFact, crossRate, np.max(sols), np.mean(sols), np.median(iters), iters[np.argmax(sols)]])
+
             elif problemnum == 2:
-                sols = [0]*trials_each            
+                sols = [0]*trials_each
+                iters = [0]*trials_each
                 for i in range(trials_each):
-                    D2 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.1, n_agents=50, scaling_factor = scalFact, crossover_rate = crossRate, doPrint=False, max_iter=10000)
+                    D2 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.1, n_agents=50, scaling_factor = scalFact, crossover_rate = crossRate, doPrint=False, max_iter=20000)
                     sols[i] = D2.calcProfit(D2.best)
-                print("Problem 2 | mean:",np.mean(sols), "| best:",np.max(sols))  
+                    iters[i] = D2.iters
+                print("Problem 2 | mean:",np.mean(sols), "| best:",np.max(sols),"| iters:",np.median(iters))
                 if(filename):
-                    data.append([scalFact, crossRate, np.max(sols), np.mean(sols)])         
-                
+                    data.append([scalFact, crossRate, np.max(sols), np.mean(sols), np.median(iters), iters[np.argmax(sols)]])
+
             else:
-                sols = [0]*trials_each            
+                sols = [0]*trials_each
+                iters = [0]*trials_each
                 for i in range(trials_each):
-                    D3 = DifferentialEvolution(maxPrices=[.5,.3,.1], maxDemands=[1e6,5e6,5e6],costPrice=.6, n_agents=50, scaling_factor = scalFact, crossover_rate = crossRate, doPrint=False, max_iter=10000)
-                    sols[i] = D3.calcProfit(D3.best)            
-                print("Problem 3 | mean:",np.mean(sols), "| best:",np.max(sols))   
+                    D3 = DifferentialEvolution(maxPrices=[.5,.3,.1], maxDemands=[1e6,5e6,5e6],costPrice=.6, n_agents=50, scaling_factor = scalFact, crossover_rate = crossRate, doPrint=False, max_iter=20000)
+                    sols[i] = D3.calcProfit(D3.best)
+                    iters[i] = D3.iters
+                print("Problem 3 | mean:",np.mean(sols), "| best:",np.max(sols),"| iters:",np.median(iters))
                 if(filename):
-                    data.append([scalFact, crossRate, np.max(sols), np.mean(sols)])
+                    data.append([scalFact, crossRate, np.max(sols), np.mean(sols), np.median(iters), iters[np.argmax(sols)]])
 
     if(filename):
         with open(filename, "w") as f:
@@ -218,8 +234,8 @@ def parameterSearch(trials_each=5, problemnum = 1, filename=False):
 
 
 if __name__ == "__main__":
-    parameterSearch(problemnum = 1, filename="1.csv")
-#    parameterSearch(problemnum = 2, filename="2.csv")
+    # parameterSearch(problemnum = 1, filename="1.csv")
+    parameterSearch(problemnum = 2, filename="2.csv")
 #    parameterSearch(problemnum = 3, filename="3.csv")
 
 """
