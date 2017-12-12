@@ -187,7 +187,7 @@ def parameterSearch(trials_each=5, problemnum = 1, filename=False):
             if problemnum == 1:
                 sols = [0]*trials_each               
                 for i in range(trials_each):
-                    D1 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.6, n_agents=50, scaling_factor = scalFact, crossover_rate = crossRate, doPrint=False, max_iter=1)
+                    D1 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.6, n_agents=50, scaling_factor = scalFact, crossover_rate = crossRate, doPrint=False, max_iter=10000)
                     sols[i] = D1.calcProfit(D1.best)
                 print("Problem 1 | mean:",np.mean(sols), "| best:",np.max(sols))
                 if(filename):
@@ -196,7 +196,7 @@ def parameterSearch(trials_each=5, problemnum = 1, filename=False):
             elif problemnum == 2:
                 sols = [0]*trials_each            
                 for i in range(trials_each):
-                    D2 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.1, n_agents=50, scaling_factor = scalFact, crossover_rate = crossRate, doPrint=False, max_iter=1)
+                    D2 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.1, n_agents=50, scaling_factor = scalFact, crossover_rate = crossRate, doPrint=False, max_iter=10000)
                     sols[i] = D2.calcProfit(D2.best)
                 print("Problem 2 | mean:",np.mean(sols), "| best:",np.max(sols))  
                 if(filename):
@@ -205,7 +205,7 @@ def parameterSearch(trials_each=5, problemnum = 1, filename=False):
             else:
                 sols = [0]*trials_each            
                 for i in range(trials_each):
-                    D3 = DifferentialEvolution(maxPrices=[.5,.3,.1], maxDemands=[1e6,5e6,5e6],costPrice=.6, n_agents=50, scaling_factor = scalFact, crossover_rate = crossRate, doPrint=False, max_iter=1)
+                    D3 = DifferentialEvolution(maxPrices=[.5,.3,.1], maxDemands=[1e6,5e6,5e6],costPrice=.6, n_agents=50, scaling_factor = scalFact, crossover_rate = crossRate, doPrint=False, max_iter=10000)
                     sols[i] = D3.calcProfit(D3.best)            
                 print("Problem 3 | mean:",np.mean(sols), "| best:",np.max(sols))   
                 if(filename):
