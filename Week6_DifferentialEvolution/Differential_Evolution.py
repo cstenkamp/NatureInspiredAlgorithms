@@ -126,9 +126,9 @@ class DifferentialEvolution():
 
 
 
-D1 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,3e7],costPrice=.6,n_agents=50)
-D2 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,3e7],costPrice=.1,n_agents=50)
-D3 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[1e6,5e6,5e6],costPrice=.6,n_agents=50)
+D1 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.6,n_agents=50)
+D2 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.1,n_agents=50)
+D3 = DifferentialEvolution(maxPrices=[.5,.3,.1], maxDemands=[1e6,5e6,5e6],costPrice=.6,n_agents=50)
 
 
 print('''
