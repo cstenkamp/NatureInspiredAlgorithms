@@ -8,7 +8,7 @@ class DifferentialEvolution():
 				maxPrices=[.45,.25,.2],
 				maxDemands=[2e6,3e7,2e7],
 				costPrice=.6,
-				kWhPerPlant=[5e4,6e5,5e6],
+				kWhPerPlant=[5e4,6e5,4e6],
 				costPerPlant=[1e4,8e4,4e5],
 				maxPlants=[100,50,3],
 				n_agents=50,
