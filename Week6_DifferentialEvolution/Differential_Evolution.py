@@ -35,8 +35,8 @@ class DifferentialEvolution():
 
 
 	def initPopulation(self,n_agents):
-		productions = np.random.uniform(0,1,[n_agents,3])*self.maxDemands
-		perMarketSells = np.random.uniform(0,1./3,[n_agents,3])*np.sum(self.maxDemands)
+		productions = np.random.uniform(0,1,[n_agents,3])*np.sum(self.maxDemands)
+		perMarketSells = np.random.uniform(0,1,[n_agents,3])*self.maxDemands
 		perMarketPrice = np.random.uniform(0,1,[n_agents,3])*self.maxPrices
 		#
 		self.population = np.hstack((productions,perMarketSells,perMarketPrice))
@@ -101,6 +101,7 @@ class DifferentialEvolution():
 				x = self.population[ax,:]
 				# four other agents
 				tmp = np.random.permutation(n_agents)[:4]
+
 				# take three that are not x (to ultimately generate the donor vector)
 				a,b,c = tmp[tmp!=ax][:3]
 				# a will be the base vector, and the difference will be generated from b and c
@@ -135,7 +136,7 @@ class DifferentialEvolution():
 			else:
 				stop_crit = 0
 			profit_hist.append(m)
-			if(stop_crit==2000):
+			if(stop_crit==3000):
 				self.iters = iter
 				print('Converged after iteration: {0:7d} | profit: {1:12.2f}'.format(iter,m))
 				return profit_hist
@@ -163,23 +164,23 @@ def print_solutions(DiffEvProb, title):
 
 
 def main():
-    D1 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.6,n_agents=50)
-    D2 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.1,n_agents=50)
-    D3 = DifferentialEvolution(maxPrices=[.5,.3,.1], maxDemands=[1e6,5e6,5e6],costPrice=.6,n_agents=50)
-
-    print_solutions(D1, "Problem 1")
-    print_solutions(D2, "Problem 2")
-    print_solutions(D3, "Problem 3")
-
-    plt.plot(D1.hist)
-    plt.plot(D2.hist)
-    plt.plot(D3.hist)
-
-    plt.legend(['D1','D2','D3'])
-    plt.title('Profits Per Problem')
-    plt.xlabel('iteration')
-    plt.ylabel('profit')
-    plt.show()
+    D1 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.6,n_agents=100, max_iter=20000, scaling_factor = 0.9, crossover_rate = .5)
+    # D2 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.1,n_agents=50)
+    # D3 = DifferentialEvolution(maxPrices=[.5,.3,.1], maxDemands=[1e6,5e6,5e6],costPrice=.6,n_agents=50, max_iter=200000, scaling_factor = 0.8, crossover_rate = .4)
+	#
+    # print_solutions(D1, "Problem 1")
+    # print_solutions(D2, "Problem 2")
+    # print_solutions(D3, "Problem 3")
+	#
+    # plt.plot(D1.hist)
+    # plt.plot(D2.hist)
+    # plt.plot(D3.hist)
+	#
+    # plt.legend(['D1','D2','D3'])
+    # plt.title('Profits Per Problem')
+    # plt.xlabel('iteration')
+    # plt.ylabel('profit')
+    # plt.show()
 
 
 def parameterSearch(trials_each=5, problemnum = 1, filename=False):
@@ -234,9 +235,10 @@ def parameterSearch(trials_each=5, problemnum = 1, filename=False):
 
 
 if __name__ == "__main__":
-    # parameterSearch(problemnum = 1, filename="1.csv")
-    parameterSearch(problemnum = 2, filename="2.csv")
-#    parameterSearch(problemnum = 3, filename="3.csv")
+    parameterSearch(problemnum = 1, filename="1.csv")
+    #parameterSearch(problemnum = 2, filename="2.csv")
+    #parameterSearch(problemnum = 3, filename="3.csv")
+	#main()
 
 """
 rm11,rm12,rm13=D1.plotMarkets()
