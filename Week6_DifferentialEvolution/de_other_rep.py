@@ -28,7 +28,8 @@ def comp_winnings(p, x):
     # compute winnings
     wins = np.sum(demands*x)
     # compute the distribution on plant types for the best profit
-    return get_max_win(p, d_all, wins)
+    m_win_plants = get_max_win(p, d_all, wins)
+    return m_win_plants + list(demands)
 
 def get_max_win(p, d_all, wins):
     # go through plant types sorted after costPerKwh - increasing
@@ -37,7 +38,7 @@ def get_max_win(p, d_all, wins):
     rest = d_all
     for idx in p.plantOrder:
         if(p.costPerKwh[idx]>=p.costPrice):
-            net_wins.append(list(ptcs)+ [wins-(np.sum(ptcs*p.costPerPlant)+rest*p.costPrice)])
+            net_wins.append([wins-(np.sum(ptcs*p.costPerPlant)+rest*p.costPrice)] + list(ptcs))
             net_wins = np.array(net_wins)
             return list(net_wins[np.argmax(net_wins[:,-1]),:])
         # fit as many plants as possible
@@ -48,9 +49,9 @@ def get_max_win(p, d_all, wins):
         if(ptcs[idx]<p.maxPlants[idx]):
             over_ptc = ptcs[:]
             over_ptc[idx]+=1
-            net_wins.append(list(over_ptc) + [wins-np.sum(over_ptc*p.costPerPlant)])
+            net_wins.append([wins-np.sum(over_ptc*p.costPerPlant)] + list(over_ptc))
 
-    net_wins.append(list(ptcs)+ [wins-(np.sum(ptcs*p.costPerPlant)+rest*p.costPrice)])
+    net_wins.append([wins-(np.sum(ptcs*p.costPerPlant)+rest*p.costPrice)] + list(ptcs))
     net_wins = np.array(net_wins)
     return list(net_wins[np.argmax(net_wins[:,-1]),:])
 
@@ -70,6 +71,7 @@ def optimize(problem,
     population = initPopulation(n_agents, problem.maxPrices)
     profit_hist = []
     max_profit = 0
+    best_x = None
     stop_crit = 0
     for iter in range(max_iter):
         profits = []
@@ -99,27 +101,36 @@ def optimize(problem,
             # reset to large prices
             Y[Y>problem.maxPrices] = x[Y>problem.maxPrices]
             # check old and new profits
-            p0 = comp_winnings(problem,x)[3]
-            p1 = comp_winnings(problem,Y)[3]
+            p0 = comp_winnings(problem,x)[0]
+            p1 = comp_winnings(problem,Y)[0]
             if p1 > p0:
                 population[ax,:] = Y
                 profits.append(p1)
             else:
                 profits.append(p0)
         m = np.max(profits)
+        mx = population[np.argmax(profits),:]
         profit_hist.append(m)
         if(m>max_profit):
             max_profit=m
+            best_x = mx
             stop_crit = 0
         else:
             stop_crit += 1
         if(stop_crit==300):
             iters = iter
             print('Converged after iteration: {0:7d} | profit: {1:12.2f}'.format(iter,m))
+            res = comp_winnings(problem,best_x)
+            print(best_x)
+            print(res)
             return profit_hist
         if iter % 100 == 0 and verbose>=1:
             print('iteration: {0:7d} | profit: {1:12.2f}'.format(iter,m))
     iters = max_iter
+    print('iteration: {0:7d} | profit: {1:12.2f}'.format(iters,m))
+    res = comp_winnings(problem,best_x)
+    print(best_x)
+    print(res)
     return profit_hist
 
 def get_best_example1():
@@ -161,7 +172,7 @@ if __name__ == "__main__":
     p1 = Problem(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.6)
     p2 = Problem(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.1)
     p3 = Problem(maxPrices=[.5,.3,.1], maxDemands=[1e6,5e6,5e6],costPrice=.6)
-    optimize(problem=p3, n_agents=50, max_iter=10000, scaling_factor = 0.8, crossover_rate = .25, verbose=1)
+    optimize(problem=p1, n_agents=50, max_iter=10000, scaling_factor = 0.8, crossover_rate = .25, verbose=1)
 
 
 """
