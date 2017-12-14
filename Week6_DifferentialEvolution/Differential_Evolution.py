@@ -41,6 +41,17 @@ class DifferentialEvolution():
 		#
 		self.population = np.hstack((productions,perMarketSells,perMarketPrice))
 
+	def exchangeWorst(self):
+		# exchange worst agents for random agent
+		n_agents = self.population.shape[0]
+		profits = list(map(lambda x: self.calcProfit(self.population[x,:]),range(n_agents)))
+		ix = np.argmin(profits)
+		productions = np.random.uniform(0,1./3,[1,3])*np.sum(self.maxDemands)
+		perMarketSells = np.random.uniform(0,1,[1,3])*self.maxDemands
+		perMarketPrice = np.random.uniform(0,1,[1,3])*self.maxPrices
+		new = np.hstack((productions,perMarketSells,perMarketPrice))
+		self.population[ix,:] = new
+
 	def demand(self, price, maxPrice, maxDemand):
 		if price > maxPrice:
 			return 0
@@ -142,7 +153,13 @@ class DifferentialEvolution():
 				return profit_hist
 			if iter % 100 == 0 and self.doPrint:
 				print('iteration: {0:7d} | profit: {1:12.2f}'.format(iter,m))
+			if iter%1000==0:
+				self.exchangeWorst()
 		self.iters = self.max_iter
+		profit = []
+		for ax in range(n_agents):
+			profit.append(self.calcProfit(self.population[ax,:]))
+		self.best = self.population[np.argmax(profit),:]
 		return profit_hist
 
 
@@ -165,8 +182,11 @@ def print_solutions(DiffEvProb, title):
 
 def main():
     D1 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.6,n_agents=100, max_iter=20000, scaling_factor = 0.9, crossover_rate = .5)
+    D1.hist = D1.optimize()
     # D2 = DifferentialEvolution(maxPrices=[.45,.25,.2], maxDemands=[2e6,3e7,2e7],costPrice=.1,n_agents=50)
+    #D2.hist = D2.optimize()
     # D3 = DifferentialEvolution(maxPrices=[.5,.3,.1], maxDemands=[1e6,5e6,5e6],costPrice=.6,n_agents=50, max_iter=200000, scaling_factor = 0.8, crossover_rate = .4)
+    #D3.hist = D3.optimize()
 	#
     # print_solutions(D1, "Problem 1")
     # print_solutions(D2, "Problem 2")
