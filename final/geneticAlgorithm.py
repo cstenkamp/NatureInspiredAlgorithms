@@ -45,7 +45,7 @@ class GenAlgo():
 				length_route = self.getRouteLength(route_buffer)
 				new_costs = self.vehicleCosts[vehicleNr]*(length_route)
 				costs += new_costs 
-				assignment.append((route_buffer,self.vehicleCosts[vehicleNr],self.vehicleCapacities[vehicleNr],new_costs))
+				assignment.append((route_buffer,self.vehicleCosts[vehicleNr],self.vehicleCapacities[vehicleNr],new_costs,vehicleNr))
 				return costs, assignment
 			idx = idx[0][0]
 			# calculate path length for vehicle
@@ -53,7 +53,7 @@ class GenAlgo():
 			# add costs of vehicle to current costs 
 			new_costs = self.vehicleCosts[vehicleNr]*(length_route)
 			costs += new_costs 
-			assignment.append((route_buffer[:idx+1],self.vehicleCosts[vehicleNr],self.vehicleCapacities[vehicleNr],new_costs))
+			assignment.append((route_buffer[:idx+1],self.vehicleCosts[vehicleNr],self.vehicleCapacities[vehicleNr],new_costs,vehicleNr))
 			# delete start of c
 			c = c[idx:]
 			route_buffer = route_buffer[idx:]

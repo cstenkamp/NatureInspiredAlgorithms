@@ -2,10 +2,12 @@ import random as rn
 import numpy as np
 from numpy.random import choice as np_choice
 import matplotlib.pyplot as plt 
-
 class AntColony(object):
 
     def __init__(self, distances, n_ants, n_best, n_iterations, decay, alpha=1, beta=1,coords=None):
+        '''
+        https://github.com/Akavall/AntColonyOptimization/blob/master/ant_colony.py
+        '''
         """
         Args:
             distances (2D numpy.array): Square matrix of distances. Diagonal is assumed to be np.inf.
