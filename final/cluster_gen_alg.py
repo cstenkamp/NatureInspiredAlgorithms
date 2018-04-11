@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from ant_colony import AntColony
+from ant_colony_kai import AntColony
 from sklearn.decomposition import PCA
 from time import time
 from itertools import permutations
@@ -284,8 +284,9 @@ class GeneticAlgorithm():
                 print("best: {}".format(best_in_gen))
             if(best_in_gen<self.best_cost):
                 self.best_cost=best_in_gen
-                self.printAssignment()
+                self.printAssignment(save=True)
         print("best_cost %f"%(self.best_cost,))
+        self.printAssignment(save=True)
 
     def submat(self, idc):
         sorted_dests = [0] + [idx+1 for idx in idc]
@@ -523,7 +524,7 @@ class GeneticAlgorithm():
             self.chromosomes = self.chromosomes[take_idc]
             self.routes = [self.routes[t_idx] for t_idx in take_idc]
 
-    def printAssignment(self):
+    def printAssignment(self, save):
         self.ax.clear()
         colors = ["#e6194b","#0082c8","#ffe119","#f58231","#3cb44b","#911eb4","#46f0f0","#f032e6","#d2f53c","#fabebe","#008080","#e6beff","#aa6e28","#fffac8","#800000","#aaffc3","#808000","#ffd8b1","#000080","#808080","#000000"]
         # find cheapest assignment
@@ -539,6 +540,8 @@ class GeneticAlgorithm():
         plt.title('Truck Routes')
         plt.legend(loc=4)
         self.f.canvas.draw()
+        if(save):
+            plt.savefig('final_res.png')
         # self.f.show()
 
 if __name__ == "__main__":
