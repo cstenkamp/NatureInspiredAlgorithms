@@ -1,0 +1,51 @@
+2,5 Versions:
+1) similar to machines scheduling
+Genetic Algorithm:
+  Init: fill up random machines
+  Select: roulette
+  Crossover: uniform
+  Mutate: randomly reassign demand
+  Replace: best
+
+  redistribute if truck is overloaded (just the overload)
+
+  Fitness Function: ACO for each truck
+
+  -> very slow and very bad (so much randomness)
+  s/gen + best result
+
+2) added kMeans
+Genetic Algorithm:
+  Init: gen = random truck order
+  Select: roulette
+  Crossover: zip
+  Mutate: randomly swap
+  Replace: best
+
+Per Gen:
+  Take first n-trucks until the cumulated capacity is enough
+  Randomly initialize KMeans seeds
+  Distance Metric is distance to line-segment from depot to seed
+  Start Clustering
+    Per Step:
+      Cluster
+      Assign trucks to clusters (match sizes as best as possible)
+      Redistribute overflows until fits:
+        1) Worst point to next best cluster
+        2) enlarge th truck
+        3) enlarge another truck
+        4) add a truck
+        5) give up
+  Fitness Function: ACO for each truck
+
+  -> very slow, better (random kmeans seeds are problem)
+
+2.5)
+Compute all possible truck combinations that are enough
+For Each (Computation time correlating with fitness):
+  DE with kMeans Random seeds
+  Clustering as above
+  Fitness Function: ACO for each truck
+
+  -not tried yet
+  - paper on de kmeans: A clustering method combining differential evolution with the K-means algorithm
